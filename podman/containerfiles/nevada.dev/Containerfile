@@ -1,0 +1,30 @@
+FROM docker.io/almalinux/9-base:latest
+
+RUN echo "Updating all Alma Packages"; dnf -y update; dnf -y clean all
+RUN echo "Installing bind9"; dnf install -y bind
+
+RUN mkdir /etc/named/zones
+RUN mkdir /etc/named/acls
+RUN mkdir /etc/named/keys
+
+ADD etc-named/named.conf* /etc/named/
+ADD etc-named/acls/acls.conf /etc/named/acls/
+ADD etc-named/zones/*.conf /etc/named/zones/
+
+COPY var-named/dynamic/* /var/named/dynamic/
+
+RUN mkdir /var/log/named
+RUN ls /etc/named
+RUN tsig-keygen acme > /etc/named/keys/acme.conf
+RUN tsig-keygen internal-update-key > /etc/named/keys/internal-update-key.conf
+RUN tsig-keygen external-update-key > /etc/named/keys/external-update-key.conf
+
+RUN chown named:named /var/log/named
+RUN chown -R named:named /etc/named
+RUN chown -R named:named /var/named/dynamic
+
+RUN named-checkconf -p /etc/named/named.conf
+EXPOSE 53
+EXPOSE 53/udp
+
+CMD /usr/sbin/named -g -d 3 -f -u named -c /etc/named/named.conf

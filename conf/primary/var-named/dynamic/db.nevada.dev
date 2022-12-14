@@ -1,0 +1,12 @@
+$ORIGIN nevada.dev.
+$TTL 3600       ; 1 hour
+nevada.dev.            IN SOA  ns1.nevada.dev. root.nevada.dev. (
+                                1667056       ; serial
+                                43200         ; refresh (12 hours)
+                                900           ; retry (15 minutes)
+                                1814400       ; expire (3 weeks)
+                                10800         ; minimum (3 hours)
+                                )
+                        NS      ns1.nevada.dev.
+                        A       10.0.0.17
+ns1                     A       134.197.247.10
